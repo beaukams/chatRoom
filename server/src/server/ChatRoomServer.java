@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
+import java.util.Iterator;
 import java.util.Vector;
 
 public class ChatRoomServer {
@@ -65,21 +66,23 @@ public class ChatRoomServer {
 		return res;
 	}
 	
-	public void saveUsersList(){
-		try {
-			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(new File(this.userBdd)));
+	/**
+	 * Sauvegarder la liste des utilisateurs dans un fichier
+	 * @throws IOException
+	 */
+	public void saveUsersList() throws IOException{
 			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(this.userBdd)));
-			
-			
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+			oos.writeObject(this.users);
 	}
 	
-	public void restorUsersList(){
-		
+	/**
+	 * restaurer la liste des utilisateurs à partir d'un fichier
+	 * @throws ClassNotFoundException
+	 * @throws IOException
+	 */
+	public void restorUsersList() throws ClassNotFoundException, IOException{
+		ObjectInputStream ois = new ObjectInputStream(new FileInputStream(new File(this.userBdd)));
+		this.users = (Vector<ChatUser>) ois.readObject();
 	}
 	
 	/**
@@ -88,10 +91,14 @@ public class ChatRoomServer {
 	 */
 	public void addUser(ChatUser user){
 		this.users.add(user);
-		this.saveUsersList();
+		try {
+			this.saveUsersList();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
-	public void delUser(){
+	public void delUser(ChatUser user){
 		
 	}
 	

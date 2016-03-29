@@ -1,6 +1,8 @@
 package server;
 
-public class ChatUser {
+import java.io.Serializable;
+
+public class ChatUser implements Serializable{
 	private String pseudo;
 	private String nom;
 	private String prenom;
