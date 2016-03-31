@@ -1,0 +1,15 @@
+Abdoulaye KAMA 
+abdoulayekama@gmail.com
+DIC2TR
+
+Nous avons essayer de realiser une application client serveur de chat. Le serveur est multithread.
+Les informations sur les clients connectés seront stockés sur une fichier nommé session_chat.txt.
+
+
+-> src: les sources du projets
+-> bin: les fichiers binaires
+-> repertoire src/serie2: package du projet
+-> src/serie2/ChatRoom.java: la classe du serveur de chat. Il est multithread
+-> src/serie2/ChatUserImpl.java: la classe du client (avec interface graphique)
+-> src/serie2/TestChatRoom.java: la classe de teste du ChatRoom.java
+-> src/serie2/TestChatUserImpl.java: la classe de teste du ChatUserImpl.java
