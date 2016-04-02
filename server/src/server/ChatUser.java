@@ -11,20 +11,20 @@ public class ChatUser implements Serializable{
 	private static long lastId;
 	private String lastConnectDate;
 	private String firstConnectDate;
-	private boolean status; //true(connecte, false(non connecte)
+	private boolean inline; //true(connecte, false(non connecte)
 	
-	public ChatUser(String pseudo, String nom, String prenom){
+	public ChatUser(String pseudo){
 		this.pseudo = pseudo;
-		this.nom = nom;
-		this.prenom = prenom;
-		this.status = false;
+		this.nom = "KAMA";
+		this.prenom = "Abdoulaye";
+		this.inline = false;
 	}
 	
 	public boolean getStatus(){
-		return this.status;
+		return this.inline;
 	}
 	
 	public void setStatus(boolean val){
-		this.status = val;
+		this.inline = val;
 	}
 }

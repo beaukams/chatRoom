@@ -12,14 +12,20 @@ import java.util.Iterator;
 import java.util.Vector;
 
 public class ChatRoomServer {
-	private boolean status;
-	private ServerSocket room;
-	private Vector <ChatUser> users;
+	private boolean running;
+	private ServerSocket serverSocket;
+	private Vector<ChatRoom> rooms;
+	private Vector<ChatUser> users;
+	//private Vector<ThreadRoom> thRooms;
+	private Vector<ThreadUser> thUsers;
 	private String userBdd = "user_bdd_file.txt";
 	
 	
 	public ChatRoomServer(int port) throws IOException{
-		this.room = new ServerSocket(port);
+		this.serverSocket = new ServerSocket(port);
+		this.running = false;
+		this.thUsers = new Vector<ThreadUser>();
+		this.users = new Vector<ChatUser> ();
 	}
 	
 	/**
@@ -27,22 +33,21 @@ public class ChatRoomServer {
 	 * @return
 	 */
 	public boolean startServer(){
-		boolean res = false || this.status;
+		boolean res = false || this.running;
 
 		if(!res){
 			
-			this.notifie("Demarrage du serveur sur le port "+this.room.getLocalPort());
+			this.notifie("Demarrage du serveur sur le port "+this.serverSocket.getLocalPort());
 			
 			try {
-				this.status = true;
+				this.running = true;
 				
-				while(this.status){
-					new ThreadUser(this.room.accept(), this);
+				while(this.running){
+					new ThreadUser(this.serverSocket.accept(), this);
 				}
 				
-				
 			} catch (IOException e) {
-				this.status = false;
+				this.running = false;
 				this.notifie("Demarrage impossible");
 			}
 		}
@@ -56,16 +61,26 @@ public class ChatRoomServer {
 	 * @return
 	 */
 	public boolean stopServer(){
-		boolean res = true && this.status;
+		boolean res = true && this.running;
 	
 		if(res){
 			
-			
+			try {
+				this.serverSocket.close();
+			} catch (IOException e) {
+				this.notifie("Fermeture impossible");
+			}
 		}
 		
 		return res;
 	}
 	
+	
+	public void notifie(String msg){
+		System.out.println(msg);
+	}
+	
+
 	/**
 	 * Sauvegarder la liste des utilisateurs dans un fichier
 	 * @throws IOException
@@ -90,6 +105,7 @@ public class ChatRoomServer {
 	 * @param user
 	 */
 	public void addUser(ChatUser user){
+		
 		this.users.add(user);
 		try {
 			this.saveUsersList();
@@ -98,18 +114,60 @@ public class ChatRoomServer {
 		}
 	}
 	
+	public void addUser(ThreadUser user){
+		this.notifie("ajout d'utilisateur");
+		this.thUsers.add(user);
+	}
+	
 	public void delUser(ChatUser user){
-		
+		Iterator<ChatUser> iter = this.users.iterator();
+		while(iter.hasNext()){
+			ChatUser cl = (ChatUser) iter.next();
+			if(cl == user)
+				this.users.remove(user);
+		}
+	}
+	
+	public void delUser(ThreadUser user){
+		Iterator<ThreadUser> iter = this.thUsers.iterator();
+		while(iter.hasNext()){
+			ThreadUser cl = (ThreadUser) iter.next();
+			if(cl == user)
+				this.thUsers.remove(user);
+		}
 	}
 	
 	public void alterUser(){
 		
 	}
+
 	
-	public void notifie(String msg){
-		System.out.println("msg");
+	
+	public void createRoom(){
+		
 	}
 	
+	/**
+	 * Diffuser un message a tous les clients connectes
+	 */
+	public void diffuseMsg(String msg){
+		Iterator<ThreadUser> iter = this.thUsers.iterator();
+		while(iter.hasNext()){
+			((ThreadUser) iter.next()).sendMsg(msg);
+		}
+	}
+	
+	public void diffuseFile(String msg){
+		Iterator<ThreadUser> iter = this.thUsers.iterator();
+		while(iter.hasNext()){
+			((ThreadUser) iter.next()).sendMsgFile(msg);
+		}
+	}
+	
+	/* getters et setters */
+	public ServerSocket getServerSocket(){
+		return this.serverSocket;
+	}
 	
 }
 
