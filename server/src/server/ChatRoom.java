@@ -6,28 +6,50 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.Iterator;
 import java.util.Vector;
 
 public class ChatRoom extends Thread{
-	private Vector <ChatUser> users;
+	private Vector <ThreadUser> users;
+	private String id;
 	
-	private ChatRoomServer server;
-	
-	public ChatRoom(ChatRoomServer server){
-		this.server = server;
+	public ChatRoom(String id){
+		this.id = id;
 	}
 	
-	public void run(){
-		while(true){
-			
+	public void addUser(ThreadUser user){
+		this.users.add(user);
+	}
+	
+	public void removeUser(ThreadUser user){
+		Iterator<ThreadUser> iter = this.users.iterator();
+		while(iter.hasNext()){
+			ThreadUser cl = (ThreadUser) iter.next();
+			if(cl == user)
+				this.users.remove(user);
 		}
 	}
 	
-	public void diffuseMsg(String msg, ChatUser source){
-		
+	/**
+	 * 
+	 * @param msg
+	 * @param source
+	 */
+	public void diffuseMsg(String msg, ThreadUser source){
+		Iterator<ThreadUser> iter = this.users.iterator();
+		while(iter.hasNext()){
+			ThreadUser user = (ThreadUser) iter.next();
+			if(user != source)
+				user.sendMsg(msg);
+		}
 	}
 	
-	public void diffuseMsg(String msg){
-		
+	public void diffuseFile(String msg, ThreadUser source){
+		Iterator<ThreadUser> iter = this.users.iterator();
+		while(iter.hasNext()){
+			ThreadUser user = (ThreadUser) iter.next();
+			if(user != source)
+				user.sendMsgFile(msg);
+		}
 	}
 }

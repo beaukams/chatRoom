@@ -16,7 +16,7 @@ public class ChatRoomServer {
 	private ServerSocket serverSocket;
 	private Vector<ChatRoom> rooms;
 	private Vector<ChatUser> users;
-	//private Vector<ThreadRoom> thRooms;
+	private Vector<ThreadRoom> thRooms;
 	private Vector<ThreadUser> thUsers;
 	private String userBdd = "user_bdd_file.txt";
 	
