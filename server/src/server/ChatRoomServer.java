@@ -11,7 +11,9 @@ import java.net.ServerSocket;
 import java.util.Iterator;
 import java.util.Vector;
 
-public class ChatRoomServer {
+import javax.swing.JTextArea;
+
+public class ChatRoomServer extends Thread{
 	private boolean running;
 	private ServerSocket serverSocket;
 	private Vector<ChatRoom> rooms;
@@ -22,14 +24,27 @@ public class ChatRoomServer {
 	
 	private int countRoom = 0;
 	
+	private JTextArea textOutPut = null;
 	
 	public ChatRoomServer(int port) throws IOException{
+		super();
 		this.serverSocket = new ServerSocket(port);
 		this.running = false;
 		this.thUsers = new Vector<ThreadUser>();
 		this.users = new Vector<ChatUser> ();
 		this.rooms = new Vector<ChatRoom>();
 		this.addRoom(); //room de base contenant tous les utilisateurs
+		
+	}
+	
+	public ChatRoomServer(int port, JTextArea outPut) throws IOException{
+		this(port);
+		this.textOutPut = outPut;
+		this.start();
+	}
+	
+	public void run(){
+		this.startServer();
 	}
 	
 	/**
@@ -81,6 +96,8 @@ public class ChatRoomServer {
 	
 	
 	public void notifie(String msg){
+		if(this.textOutPut != null)
+			this.textOutPut.setText(this.textOutPut.getText()+msg+"\n");
 		System.out.println(msg);
 	}
 	
