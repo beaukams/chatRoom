@@ -1,6 +1,7 @@
 package client;
 
 import java.awt.TextArea;
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -8,7 +9,7 @@ import java.io.InputStreamReader;
 public class ThreadReceiver extends Thread{
 	private ChatRoomClient client;
 	private TextArea output = null;
-	private BufferedReader in;
+	private BufferedInputStream in;
 	
 	public ThreadReceiver(ChatRoomClient client){
 		super();
@@ -23,26 +24,30 @@ public class ThreadReceiver extends Thread{
 	
 	public void run(){
 		try {
-			this.in = new BufferedReader(new InputStreamReader(this.client.getSocket().getInputStream()));
+			this.in = new BufferedInputStream(this.client.getSocket().getInputStream());
 			long fileLength = 0;
-			String fileContents = "";
+			int count = 0;
+			byte [][] fileContents = null;
 			String fileName = "";
 			String msg = "";
-			
+			byte buffer [] = new byte [4096*2];
+			int b;
 			while(this.client.getStatus()){
-				if(this.in.ready()){
-					msg = this.in.readLine();
+				
+				while((b=this.in.read(buffer, 0, buffer.length)) > 0){
+					msg = new String(buffer);
 					this.notifie(msg);
 					
 					if(msg.startsWith("TFSI:")){ //longuuer
 						String n = msg.substring(msg.indexOf(":")+1, msg.length());
 						System.out.println(n);
 						fileLength = Long.parseLong(n);
-						
+						fileContents = new byte [(int)fileLength][4096*2];
 						
 					}else if(msg.startsWith("TFSC:")){ //contenu
 						
-						fileContents += msg.substring(msg.indexOf(":")+1, msg.length());
+						fileContents[count] = msg.substring(msg.indexOf(":")+1, msg.length()).getBytes();
+						count++;
 						
 					}else if(msg.startsWith("TFSF:")){ //nom et fin
 						fileName = msg.substring(msg.indexOf(":")+1, msg.length());
@@ -50,7 +55,7 @@ public class ThreadReceiver extends Thread{
 						//cree le 
 						this.client.recvFile(fileName, fileLength, fileContents);
 						
-						fileContents = "";
+						fileContents = null;
 						fileLength = 0;
 						fileName = "";
 						
@@ -67,6 +72,24 @@ public class ThreadReceiver extends Thread{
 			this.toStop();
 		}
 		
+	}
+	
+	public String getKeyWord(byte [] b, int index){
+		String res = "";
+		
+		for(int i=0; i<b.length; i++){
+			if(b[i] == ':'){
+				index--;
+				continue;
+			}
+			
+			if(index == 0) break;
+			
+			if(index == 1)
+				res += b[i];
+		}
+		
+		return res;
 	}
 	
 	public void toStop(){

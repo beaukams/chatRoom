@@ -23,12 +23,12 @@ public class TestChatRoomClient {
 			try {
 				Thread.sleep(3000);
 				cl1.sendMsg("client 1: message g 0",  0);
-				cl1.sendMsg("client 1: message g 1",  1);
+			/*	cl1.sendMsg("client 1: message g 1",  1);
 				cl1.sendMsg("client 1: message g 2",  2);
 				
 				cl2.sendMsg("client 2: message g 1",  1);
 				
-				cl1.sendFile("senegal.png", 1);
+				cl1.sendFile("senegal.png", 1);*/
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

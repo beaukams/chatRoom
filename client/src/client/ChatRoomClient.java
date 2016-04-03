@@ -1,6 +1,9 @@
 package client;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -12,6 +15,8 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.charset.Charset;
+
 
 import javax.swing.JOptionPane;
 
@@ -20,7 +25,7 @@ import javax.swing.JOptionPane;
 public class ChatRoomClient {
 	private Socket socket;
 	private boolean running = false;
-	private PrintWriter out;
+	private BufferedOutputStream out;
 	private ThreadReceiver recepteur;
 	private ClientGui gui = null;
 	
@@ -40,7 +45,7 @@ public class ChatRoomClient {
 	public void startClient(){
 		try{
 			
-			this.out = new PrintWriter(this.socket.getOutputStream(), true);
+			this.out = new BufferedOutputStream(this.socket.getOutputStream(), 4096*2);
 			this.running = true;
 			this.recepteur = new ThreadReceiver(this);
 			
@@ -62,7 +67,12 @@ public class ChatRoomClient {
 	 * arreter le flux
 	 */
 	public void stopClient(){
-		this.out.close();
+		try {
+			this.out.flush();
+			this.out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	
@@ -72,16 +82,25 @@ public class ChatRoomClient {
 	 * @param msg
 	 */
 	private void send(String msg){
-		try{
-			this.notifie(msg);
-			this.out.println(msg);
 
+		this.send(msg.getBytes());
+	}
+	
+	private void send(byte [] msg){
+		try{
+			this.notifie(new String(msg));
+			this.out.write(msg, 0, msg.length);
 			this.out.flush();
 			
 		}catch(Exception e){
 			JOptionPane.showMessageDialog(null, "Imposssible d'envoyer ce message");
 			System.exit(-1);
 		}
+	}
+	
+	private void send(byte [][] msg){
+		for(int i=0; i<msg.length; i++)
+			this.send(msg[i]);
 	}
 	
 	/**
@@ -98,8 +117,10 @@ public class ChatRoomClient {
 	  * @param fichier
 	  * @param idRoom
 	  */
-	public void sendFile(String fichier, int idRoom){
+	/*public void sendFile(String fichier, int idRoom){
 		File file = new File(fichier);
+		
+		
 		try {
 			BufferedReader rdf = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
 			String msg = "TFS:"+idRoom+":TFSI:"+1000;
@@ -109,6 +130,7 @@ public class ChatRoomClient {
 				msg = "TFS:"+idRoom+":TFSC:"+rdf.readLine();
 				this.send(msg);
 			}
+			
 			
 			msg = "TFS:"+idRoom+":TFSF:"+file.getName();
 			this.send(msg);
@@ -123,8 +145,116 @@ public class ChatRoomClient {
 		}
 		
 		
+	}*/
+	
+	public void sendFile(String fichier, int idRoom){
+		File file = new File(fichier);
+		int max = 4096*2;
+		
+		try {
+			
+			BufferedInputStream rdf = new BufferedInputStream(new FileInputStream(file));
+			byte data [] = this.readStream(rdf);
+			rdf.close();
+			
+			byte msg [][] = makeBytes("TFS:"+idRoom+":TFSC:", data, max);
+			
+			this.send("TFS:"+idRoom+":TFSI:"+msg.length);
+			
+			this.send(msg);
+
+			this.send("TFS:"+idRoom+":TFSF:"+file.getName());
+			
+			
+		} catch (FileNotFoundException e) {
+			JOptionPane.showMessageDialog(null, "Fichier introuvable");
+			//System.exit(-1);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+	}
+	
+	public static byte [] makeBytes(String msg, byte [] b){
+		byte ms [] = msg.getBytes();
+		byte res [] = new byte [ms.length+b.length];
+		
+		for(int i=0; i<ms.length; i++){
+			res [i] = ms[i];
+		}
+		
+		for(int i=0; i<b.length; i++){
+			res[ms.length+i] = b[i];
+		}
+		
+		return res;
+	}
+	
+	public static byte [] makeBytes(byte [] ms, byte [] b){
+		
+		byte res [] = new byte [ms.length+b.length];
+		
+		for(int i=0; i<ms.length; i++){
+			res [i] = ms[i];
+		}
+		
+		for(int i=0; i<b.length; i++){
+			res[ms.length+i] = b[i];
+		}
+		
+		return res;
+	}
+	
+	public static byte [][] makeBytes(byte [] ms, byte [] b, int taille){
+		
+		byte [][] temp = byteToBytes(b, taille-ms.length);
+		byte [][] res = new byte [temp.length][taille];
+		
+		for(int i=0; i<res.length; i++){
+			res[i] = makeBytes(ms, temp[i]);
+		}
+		
+		return res;
+	}
+	
+	public static byte [][] makeBytes(String ms, byte [] b, int taille){
+		
+		return makeBytes(ms.getBytes(), b, taille);
 	}
 
+	/**
+	 * Mettre un tableau de byte en plusieurs byte de taille taille
+	 * @param b
+	 * @param taille
+	 * @return
+	 */
+	public static byte [][] byteToBytes(byte [] b, int taille){
+		
+		byte temp [] = b;
+		int n = temp.length%taille==0 ? temp.length/taille : temp.length/taille+1; 
+		
+		byte res [][] = new byte [n][taille];
+		
+		for(int i=0; i<temp.length; i++){
+			res[i/taille][i%taille] = temp[i];
+		}
+		
+		return res;
+	}
+	
+	public  byte [] readStream(InputStream is) throws IOException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		int b;
+ 
+
+		while ( (b=is.read()) >= 0) {
+			baos.write(b);
+		}
+		
+		return baos.toByteArray();
+	}
 	
 	public void quit(){
 		this.send("EXIT");
@@ -146,7 +276,7 @@ public class ChatRoomClient {
 		
 	}
 	
-	public void recvFile(String name, long length, String contents){
+	public void recvFile(String name, long length, byte [][] contents){
 		
 		String extension = name.substring(name.lastIndexOf("."), name.length());
 		String nameFile = name.substring(0, name.lastIndexOf("."));
@@ -159,8 +289,11 @@ public class ChatRoomClient {
 		
 		try {
 			if(file.createNewFile()){
-				PrintWriter pw = new PrintWriter(new FileOutputStream(file), true);
-				pw.println(contents);
+				BufferedOutputStream pw = new BufferedOutputStream(new FileOutputStream(file));
+				for(int i=0; i<contents.length; i++){
+					pw.write(contents[i], 0, contents[i].length);
+					pw.flush();
+				}
 				pw.close();
 				this.notifie("reception fichier"+file.getName()+" contents:"+contents);
 			}
