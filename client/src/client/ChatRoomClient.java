@@ -27,14 +27,14 @@ public class ChatRoomClient {
 	private boolean running = false;
 	private BufferedOutputStream out;
 	private ThreadReceiver recepteur;
-	private ClientGui gui = null;
+	private Gui gui = null;
 	
 	public ChatRoomClient(String host, int port) throws UnknownHostException, IOException{
 		this.socket = new Socket(host, port);
 		this.notifie("Connexion au serveur "+this.socket.getInetAddress().getHostAddress()+":"+this.socket.getPort());
 	}
 	
-	public ChatRoomClient(String host, int port, ClientGui gui) throws UnknownHostException, IOException{
+	public ChatRoomClient(String host, int port, Gui gui) throws UnknownHostException, IOException{
 		this(host, port);
 		this.gui = gui;
 	}
@@ -293,11 +293,11 @@ public class ChatRoomClient {
 		}
 		
 		File fichier;
-		System.out.println("name: \n");
+		
 		
 		if(new File(name).exists()){
 			name = nameFile+"_new"+Math.random()*1000+""+extension;
-		}
+		} 
 		
 		try {
 			fichier = new File(name);
