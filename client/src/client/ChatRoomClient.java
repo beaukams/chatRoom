@@ -148,9 +148,13 @@ public class ChatRoomClient {
 	
 	public void recvFile(String name, long length, String contents){
 		
+		String extension = name.substring(name.lastIndexOf("."), name.length());
+		String nameFile = name.substring(0, name.lastIndexOf("."));
+		
 		File file = new File(name);
+		
 		if(file.exists()){
-			file = new File(name+"_new"+Math.random()*1000);
+			file = new File(nameFile+"_new"+Math.random()*1000+""+extension);
 		}
 		
 		try {
