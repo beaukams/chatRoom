@@ -20,12 +20,16 @@ public class ChatRoomServer {
 	private Vector<ThreadUser> thUsers;
 	private String userBdd = "user_bdd_file.txt";
 	
+	private int countRoom = 0;
+	
 	
 	public ChatRoomServer(int port) throws IOException{
 		this.serverSocket = new ServerSocket(port);
 		this.running = false;
 		this.thUsers = new Vector<ThreadUser>();
 		this.users = new Vector<ChatUser> ();
+		this.rooms = new Vector<ChatRoom>();
+		this.addRoom(); //room de base contenant tous les utilisateurs
 	}
 	
 	/**
@@ -107,6 +111,9 @@ public class ChatRoomServer {
 	public void addUser(ChatUser user){
 		
 		this.users.add(user);
+		
+		
+		
 		try {
 			this.saveUsersList();
 		} catch (IOException e) {
@@ -117,14 +124,18 @@ public class ChatRoomServer {
 	public void addUser(ThreadUser user){
 		this.notifie("ajout d'utilisateur");
 		this.thUsers.add(user);
+		//l'ajouter au room de base
+		this.getBaseRoom().addUser(user);
 	}
 	
 	public void delUser(ChatUser user){
 		Iterator<ChatUser> iter = this.users.iterator();
 		while(iter.hasNext()){
 			ChatUser cl = (ChatUser) iter.next();
-			if(cl == user)
+			if(cl == user){
 				this.users.remove(user);
+				
+			}
 		}
 	}
 	
@@ -132,8 +143,10 @@ public class ChatRoomServer {
 		Iterator<ThreadUser> iter = this.thUsers.iterator();
 		while(iter.hasNext()){
 			ThreadUser cl = (ThreadUser) iter.next();
-			if(cl == user)
+			if(cl == user){
 				this.thUsers.remove(user);
+				this.getBaseRoom().removeUser(user);
+			}
 		}
 	}
 	
@@ -141,27 +154,57 @@ public class ChatRoomServer {
 		
 	}
 
+	public ChatRoom getBaseRoom(){
+		ChatRoom base = this.rooms.firstElement();
+		return base;
+	}
 	
+	public ChatRoom getLastRoom(){
+		return this.rooms.lastElement();
+	}
 	
-	public void createRoom(){
-		
+	public void addRoom(){
+		this.notifie("Creation du room "+this.countRoom);
+		this.rooms.add(new ChatRoom(this.countRoom));
+		this.countRoom++;
 	}
 	
 	/**
-	 * Diffuser un message a tous les clients connectes
+	 * Recupere le room corespondant au numero donné
+	 * @param id
+	 * @return
 	 */
-	public void diffuseMsg(String msg){
-		Iterator<ThreadUser> iter = this.thUsers.iterator();
+	public ChatRoom getRoom(int id){
+		Iterator<ChatRoom> iter = this.rooms.iterator();
+		ChatRoom res = null;
 		while(iter.hasNext()){
-			((ThreadUser) iter.next()).sendMsg(msg);
+			ChatRoom temp = (ChatRoom) iter.next();
+			if(temp.getIdRoom() == id){
+				res = temp; break;
+			}
 		}
+		
+		return res;
 	}
 	
-	public void diffuseFile(String msg){
-		Iterator<ThreadUser> iter = this.thUsers.iterator();
-		while(iter.hasNext()){
-			((ThreadUser) iter.next()).sendMsgFile(msg);
-		}
+	/**
+	 * Envoyer un message à tous les clients du room
+	 * @param msg
+	 * @param idRoom
+	 * @param source
+	 */
+	public void diffuseMsg(String msg, int idRoom, ThreadUser source){
+		this.getRoom(idRoom).diffuseMsg(msg, source);
+	}
+	
+	/**
+	 * Envoyer un fichier à tous clients du room
+	 * @param msg
+	 * @param idRoom
+	 * @param source
+	 */
+	public void diffuseFile(String msg, int idRoom, ThreadUser source){
+		this.getRoom(idRoom).diffuseFile(msg, source);
 	}
 	
 	/* getters et setters */

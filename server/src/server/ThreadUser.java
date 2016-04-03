@@ -74,44 +74,66 @@ public class ThreadUser extends Thread{
 		
 	}
 	
-	public void interprete(String msg){
+	public synchronized void  interprete(String msg){
+		
+		int idRoom;
+		String temp = "";
 		
 		String commande = msg.substring(0, msg.indexOf(":"));
 		msg = msg.substring(msg.indexOf(":")+1, msg.length());
 		this.server.notifie("commande "+commande+" msg "+msg);
 		
-		if(commande.equals("MSG")){//message
-			this.server.diffuseMsg(msg);
-			
-		}else if(commande.equals("AUTH")){ //enregistrement
+		switch(commande){
+		case "MSG":
+			idRoom = Integer.parseInt(msg.substring(0, msg.indexOf(":")));
+			msg = msg.substring(msg.indexOf(":")+1, msg.length());
+			this.server.diffuseMsg(msg, idRoom, this);
+			break;
+		case "AUTH":
 			String pseudo = msg;
 			out.println("Bonjour!!!"+pseudo);
 			System.out.println("NOUVEAU UTILISATEUR CONNECTE: "+msg);
 			this.user = new ChatUser(pseudo);
 			this.server.addUser(this);
+			break;
 			
-		}else if(commande.equals("INSCR")){ //inscription
+		case "TFS":
+			idRoom = Integer.parseInt(msg.substring(0, msg.indexOf(":")));
+			msg = msg.substring(msg.indexOf(":")+1, msg.length());
+			this.server.diffuseFile(msg, idRoom, this);
+			break;
 			
-		}else if(commande.equals("DESINS")){ //desinscription
-			
-		}else if(commande.equals("EXIT")){ //deconnexion
+		case "EXIT":
 			this.toStop();
+			break;
 			
-		}else if(commande.equals("EXITR")){ //quitter un room
+		case "NEWROOM":
+			this.server.addRoom();
+			break;
 			
-		}else if(commande.equals("TFS")){ //transfert de fichiers
-			this.server.diffuseFile(msg);
-		}else{
+		case "JOINROOM":
+			this.server.addUser(this);
+			this.server.getRoom(Integer.parseInt(msg)).addUser(this);
+			break;
+			
+		case "QUITROOM":
+			this.server.getRoom(Integer.parseInt(msg)).removeUser(this);
+			break;
+			
+		default:
 			
 		}
+		
 		
 	}
 	
 	public void sendMsg(String msg){
+		this.server.notifie("MSG:"+msg);
 		this.out.println("MSG:"+msg);
 	}
 	
 	public void sendMsgFile(String msg){
+		this.server.notifie(msg);
 		this.out.println(msg);
 	}
 	

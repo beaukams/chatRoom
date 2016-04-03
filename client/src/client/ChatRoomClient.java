@@ -65,36 +65,53 @@ public class ChatRoomClient {
 		this.out.close();
 	}
 	
+	
+	
 	/**
-	 * Envoyer un message
+	 * Envoyer une chaine de caractere 
 	 * @param msg
 	 */
-	public void sendMsg(String msg){
+	private void send(String msg){
 		try{
+			this.notifie(msg);
 			this.out.println(msg);
 
 			this.out.flush();
-			this.notifie(msg);
+			
 		}catch(Exception e){
-			JOptionPane.showMessageDialog(null, "Vous n'est pas connecte à un serveur! Veuillez demarrer le serveur!");
+			JOptionPane.showMessageDialog(null, "Imposssible d'envoyer ce message");
 			System.exit(-1);
 		}
 	}
 	
-	public void sendFile(String fichier){
+	/**
+	 * Envoyer un message
+	 * @param msg
+	 * @param idRoom
+	 */
+	public void sendMsg(String msg, int idRoom){
+		this.send("MSG:"+idRoom+":"+msg);
+	}
+	
+	 /**
+	  * Envoyer un fichier 
+	  * @param fichier
+	  * @param idRoom
+	  */
+	public void sendFile(String fichier, int idRoom){
 		File file = new File(fichier);
 		try {
 			BufferedReader rdf = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-			String msg = "TFS:TFSI:"+1000;
-			this.sendMsg(msg);
+			String msg = "TFS:"+idRoom+":TFSI:"+1000;
+			this.send(msg);
 			
 			while(rdf.ready()){
-				msg = "TFS:TFSC:"+rdf.readLine();
-				this.sendMsg(msg);
+				msg = "TFS:"+idRoom+":TFSC:"+rdf.readLine();
+				this.send(msg);
 			}
 			
-			msg = "TFS:TFSF:"+file.getName();
-			this.sendMsg(msg);
+			msg = "TFS:"+idRoom+":TFSF:"+file.getName();
+			this.send(msg);
 			
 			rdf.close();
 		} catch (FileNotFoundException e) {
@@ -108,6 +125,27 @@ public class ChatRoomClient {
 		
 	}
 
+	
+	public void quit(){
+		this.send("EXIT");
+	}
+	
+	public void creeRoom(){
+		this.send("NEWROOM:");
+	}
+	
+	public void joinRoom(int idRoom){
+		this.send("JOINROOM:"+idRoom);
+	}
+	
+	public void quitRoom(int idRoom){
+		this.send("QUITROOM:"+idRoom);
+	}
+	
+	public void addUserToRoom(){
+		
+	}
+	
 	public void recvFile(String name, long length, String contents){
 		
 		File file = new File(name);
