@@ -35,12 +35,13 @@ public class ThreadReceiver extends Thread{
 			while(this.client.getStatus()){
 				
 				while((b=this.in.read(buffer, 0, buffer.length)) > 0){
-					msg = new String(buffer);
-					this.notifie(msg);
+					msg = new String(buffer).trim();
+					this.notifie(msg.trim());
 					
 					if(msg.startsWith("TFSI:")){ //longuuer
+						
 						String n = msg.substring(msg.indexOf(":")+1, msg.length());
-						System.out.println(n);
+						
 						fileLength = Long.parseLong(n);
 						fileContents = new byte [(int)fileLength][4096*2];
 						
@@ -51,6 +52,7 @@ public class ThreadReceiver extends Thread{
 						
 					}else if(msg.startsWith("TFSF:")){ //nom et fin
 						fileName = msg.substring(msg.indexOf(":")+1, msg.length());
+						System.out.println("messs ");
 						
 						//cree le 
 						this.client.recvFile(fileName, fileLength, fileContents);

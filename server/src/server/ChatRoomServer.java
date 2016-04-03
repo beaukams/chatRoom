@@ -220,7 +220,7 @@ public class ChatRoomServer extends Thread{
 	 * @param idRoom
 	 * @param source
 	 */
-	public void diffuseFile(String msg, int idRoom, ThreadUser source){
+	public void diffuseFile(byte [] msg, int idRoom, ThreadUser source){
 		this.getRoom(idRoom).diffuseFile(msg, source);
 	}
 	

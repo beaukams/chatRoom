@@ -82,13 +82,13 @@ public class ChatRoomClient {
 	 * @param msg
 	 */
 	private void send(String msg){
-
+		this.notifie(new String(msg));
 		this.send(msg.getBytes());
 	}
 	
 	private void send(byte [] msg){
 		try{
-			this.notifie(new String(msg));
+			
 			this.out.write(msg, 0, msg.length);
 			this.out.flush();
 			
@@ -149,7 +149,8 @@ public class ChatRoomClient {
 	
 	public void sendFile(String fichier, int idRoom){
 		File file = new File(fichier);
-		int max = 4096*2;
+		System.out.println("taille en byte "+file.length());
+		int max = (int) file.length();
 		
 		try {
 			
@@ -245,6 +246,8 @@ public class ChatRoomClient {
 	}
 	
 	public  byte [] readStream(InputStream is) throws IOException {
+		System.out.println("taille en byte ald "+is.available());
+		
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		int b;
  
@@ -253,7 +256,9 @@ public class ChatRoomClient {
 			baos.write(b);
 		}
 		
-		return baos.toByteArray();
+		byte bb [] = baos.toByteArray();
+		System.out.println("taille en byte ddd   "+bb.length);
+		return bb;
 	}
 	
 	public void quit(){
@@ -277,31 +282,47 @@ public class ChatRoomClient {
 	}
 	
 	public void recvFile(String name, long length, byte [][] contents){
+		System.out.println("recuuuuuuu  "+name+"--");
 		
-		String extension = name.substring(name.lastIndexOf("."), name.length());
-		String nameFile = name.substring(0, name.lastIndexOf("."));
+		String extension = "";
+		String nameFile = name;
 		
-		File file = new File(name);
+		if(name.endsWith(".py") || name.endsWith(".png") || name.endsWith(".JPEG") || name.endsWith(".txt")){
+			extension = name.substring(name.lastIndexOf("."), name.length())+"";
+			name.substring(0, name.lastIndexOf("."));
+		}
 		
-		if(file.exists()){
-			file = new File(nameFile+"_new"+Math.random()*1000+""+extension);
+		File fichier;
+		System.out.println("name: \n");
+		
+		if(new File(name).exists()){
+			name = nameFile+"_new"+Math.random()*1000+""+extension;
 		}
 		
 		try {
-			if(file.createNewFile()){
-				BufferedOutputStream pw = new BufferedOutputStream(new FileOutputStream(file));
+			fichier = new File(name);
+			fichier.createNewFile();
+			try {
+				System.out.println("name: "+fichier.getName()+"\n");
+				BufferedOutputStream pw = new BufferedOutputStream(new FileOutputStream(fichier));
 				for(int i=0; i<contents.length; i++){
 					pw.write(contents[i], 0, contents[i].length);
 					pw.flush();
 				}
 				pw.close();
-				this.notifie("reception fichier"+file.getName()+" contents:"+contents);
-			}
+				this.notifie("reception fichier"+fichier.getName()+" contents:"+contents);
 			
 		
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		
+		
 		
 		
 	}

@@ -84,22 +84,24 @@ public class ThreadUser extends Thread{
 		String msg = "";
 		
 		while(this.containsKeyWord(tout)){
-			
+			System.out.println("tout2 "+tout+"\n");
 			String commande = tout.substring(0, tout.indexOf(":"));
 			tout = tout.substring(tout.indexOf(":")+1, tout.length());
 			
 			if(this.indexFirstKey(tout) != -1){
 				msg = tout.substring(0, this.indexFirstKey(tout));
-				tout = tout.substring(this.indexFirstKey(tout)+1, tout.length());
+				tout = tout.substring(this.indexFirstKey(tout), tout.length());
 			}else
 				msg = tout;
 			
+			System.out.println("tout1 "+tout+"\n");
 			
-			msg = msg.substring(msg.indexOf(":")+1, msg.length());
+			//msg = msg.substring(msg.indexOf(":")+1, msg.length());
 			this.server.notifie("commande "+commande+" msg "+msg);
 			
 			switch(commande){
 			case "MSG":
+				System.out.println("cc "+msg);
 				idRoom = Integer.parseInt(msg.substring(0, msg.indexOf(":")));
 				msg = msg.substring(msg.indexOf(":")+1, msg.length());
 				this.server.diffuseMsg(msg, idRoom, this);
@@ -113,9 +115,12 @@ public class ThreadUser extends Thread{
 				break;
 				
 			case "TFS":
+				
 				idRoom = Integer.parseInt(msg.substring(0, msg.indexOf(":")));
+				
 				msg = msg.substring(msg.indexOf(":")+1, msg.length());
-				this.server.diffuseFile(msg, idRoom, this);
+				this.server.diffuseFile(msg.getBytes(), idRoom, this);
+				//this.sendMsgFile(msg.getBytes());
 				break;
 				
 			case "EXIT":
@@ -150,7 +155,7 @@ public class ThreadUser extends Thread{
 	
 	public int indexFirstKey(String msg){
 		int min = 20;
-		String keys [] = {"MSG", "AUTH", "TFS", "EXIT", "NEWROOM", "JOINROOM", "QUITROOM"};
+		String keys [] = {"MSG:", "AUTH:", "TFS:", "EXIT:", "NEWROOM:", "JOINROOM:", "QUITROOM:"};
 		for(int i=0; i<keys.length; i++){
 			if(min > indexNextKey(msg, keys[i]) && indexNextKey(msg, keys[i]) != -1){
 				min = indexNextKey(msg, keys[i]);
@@ -163,75 +168,29 @@ public class ThreadUser extends Thread{
 	}
 	
 	public boolean containsKeyWord(String msg){
-		return msg.contains("MSG") || msg.contains("AUTH") || msg.contains("TFS") || msg.contains("EXIT") || msg.contains("NEWROOM") || msg.contains("JOINROOM") || msg.contains("QUITROOM");
+		return msg.contains("MSG:") || msg.contains("AUTH:") || msg.contains("TFS:") || msg.contains("EXIT:") || msg.contains("NEWROOM:") || msg.contains("JOINROOM:") || msg.contains("QUITROOM:");
 	}
 	
-	public synchronized void  interprete(String msg){
-		
-		int idRoom;
-		String temp = "";
-		
-		String commande = msg.substring(0, msg.indexOf(":"));
-		msg = msg.substring(msg.indexOf(":")+1, msg.length());
-		this.server.notifie("commande "+commande+" msg "+msg);
-		
-		switch(commande){
-		case "MSG":
-			idRoom = Integer.parseInt(msg.substring(0, msg.indexOf(":")));
-			msg = msg.substring(msg.indexOf(":")+1, msg.length());
-			this.server.diffuseMsg(msg, idRoom, this);
-			break;
-		case "AUTH":
-			String pseudo = msg;
-			//out.println("Bonjour!!!"+pseudo);
-			System.out.println("NOUVEAU UTILISATEUR CONNECTE: "+msg);
-			this.user = new ChatUser(pseudo);
-			this.server.addUser(this);
-			break;
-			
-		case "TFS":
-			idRoom = Integer.parseInt(msg.substring(0, msg.indexOf(":")));
-			msg = msg.substring(msg.indexOf(":")+1, msg.length());
-			this.server.diffuseFile(msg, idRoom, this);
-			break;
-			
-		case "EXIT":
-			this.toStop();
-			break;
-			
-		case "NEWROOM":
-			this.server.addRoom();
-			break;
-			
-		case "JOINROOM":
-			this.server.addUser(this);
-			this.server.getRoom(Integer.parseInt(msg)).addUser(this);
-			break;
-			
-		case "QUITROOM":
-			this.server.getRoom(Integer.parseInt(msg)).removeUser(this);
-			break;
-			
-		default:
-			
-		}
-		
-		
-	}
+	
 	
 	public void sendMsg(String msg){
-		this.server.notifie("MSG:"+msg);
+		this.server.notifie("envoie-----------------------------MSG:"+msg);
 		this.send("MSG:"+msg);
 	}
 	
-	public void sendMsgFile(String msg){
-		this.server.notifie(msg);
+	public void sendMsgFile(byte [] msg){
+		this.server.notifie("envoie-----------------------------fichier----------------");
 		this.send(msg);
 	}
 	
 	public void send(String msg){
+		this.send(msg.getBytes());
+		
+	}
+	
+	public void send(byte [] msg){
 		try {
-			this.out.write(msg.getBytes());
+			this.out.write(msg, 0, msg.length);
 			this.out.flush();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
