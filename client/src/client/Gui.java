@@ -1052,6 +1052,10 @@ public class Gui extends JFrame {
             public String getElementAt(int i) { return strings[i]; }
         });
 	}
+	
+	public void refreshListUsers(final String [] users){
+		
+	}
 
 	/**
      * @param args the command line arguments

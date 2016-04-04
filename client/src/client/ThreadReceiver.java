@@ -69,7 +69,7 @@ public class ThreadReceiver extends Thread{
 						this.client.stopClient();
 						JOptionPane.showMessageDialog(this.client.getGui().getAccueil(),"pseudo ou mot de passe invalide!", "Parametres invalides", this.client.getGui().HEIGHT);
 						
-					}else if(msg.startsWith("USERS")){
+					}else if(msg.startsWith("DUSER")){
 						
 					}else if(msg.startsWith("ROOMS:")){
 						

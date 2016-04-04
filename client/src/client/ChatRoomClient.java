@@ -307,7 +307,7 @@ public class ChatRoomClient {
 	}
 	
 	public void recvFile(String name, long length, byte [][] contents){
-		System.out.println("recuuuuuuu  "+name+"--");
+		
 		
 		String extension = "";
 		String nameFile = name;
@@ -350,7 +350,35 @@ public class ChatRoomClient {
 	}
 	
 	
+	public void addContact(String contact){
+		this.contacts.add(contact);
+		this.gui.refreshListContact((String []) this.contacts.toArray());
+	}
 	
+	public void addUser(String user){
+		this.users.add(user);
+		this.gui.refreshListUsers((String []) this.users.toArray());
+	}
+	
+	public void addRoom(String room){
+		this.rooms.add(room);
+		this.gui.refreshListRooms((String []) this.rooms.toArray());
+	}
+	
+	public void delContact(String contact){
+		this.contacts.remove(contact);
+		this.gui.refreshListContact((String []) this.contacts.toArray());
+	}
+	
+	public void delUser(String user){
+		this.users.remove(user);
+		this.gui.refreshListUsers((String []) this.users.toArray());
+	}
+	
+	public void delRoom(String room){
+		this.rooms.remove(room);
+		this.gui.refreshListRooms((String []) this.rooms.toArray());
+	}
 	
 	public boolean getStatus(){
 		return this.running;
