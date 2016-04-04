@@ -16,6 +16,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
+import java.util.Vector;
 
 
 import javax.swing.JOptionPane;
@@ -28,10 +29,18 @@ public class ChatRoomClient {
 	private BufferedOutputStream out;
 	private ThreadReceiver recepteur;
 	private Gui gui = null;
+	private Vector<String> users;
+	private Vector<String> rooms;
+	private Vector<String> contacts;
+	
 	
 	public ChatRoomClient(String host, int port) throws UnknownHostException, IOException{
 		this.socket = new Socket(host, port);
 		this.notifie("Connexion au serveur "+this.socket.getInetAddress().getHostAddress()+":"+this.socket.getPort());
+		
+		this.users = new Vector<String>();
+		this.rooms = new Vector<String>();
+		this.contacts = new Vector<String>();
 	}
 	
 	public ChatRoomClient(String host, int port, Gui gui) throws UnknownHostException, IOException{

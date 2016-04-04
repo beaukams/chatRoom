@@ -54,9 +54,7 @@ public class ThreadReceiver extends Thread{
 						
 					}else if(msg.startsWith("TFSF:")){ //nom et fin
 						fileName = msg.substring(msg.indexOf(":")+1, msg.length());
-						//System.out.println("messs ");
-						
-						//cree le 
+
 						this.client.recvFile(fileName, fileLength, fileContents);
 						
 						fileContents = null;
@@ -66,10 +64,19 @@ public class ThreadReceiver extends Thread{
 					}else if(msg.startsWith("AUTH:SUCCESS")){
 						this.client.getGui().getAccueil().setVisible(false);
 				        this.client.getGui().getContenu().setVisible(true);
-				        //this.client.getGui().
+				        
 					}else if(msg.startsWith("AUTH:DENIED")){
 						this.client.stopClient();
 						JOptionPane.showMessageDialog(this.client.getGui().getAccueil(),"pseudo ou mot de passe invalide!", "Parametres invalides", this.client.getGui().HEIGHT);
+						
+					}else if(msg.startsWith("USERS")){
+						
+					}else if(msg.startsWith("ROOMS:")){
+						
+					}else if(msg.startsWith("CONTACTS:")){
+						
+					}else if(msg.startsWith("USERS")){
+						
 					}
 					else{
 								
