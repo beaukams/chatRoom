@@ -233,7 +233,8 @@ public class Fonctions {
             connect.close();
         }catch(SQLException e)
         {
-            System.out.println(e.getMessage());
+            //System.out.println(e.getMessage());
+        	tab = null;
         }
         
         return tab;
@@ -277,7 +278,7 @@ public class Fonctions {
      * liste des users 
      * @return 
      */
-    public Object []listUsers(){
+    public static Object [] listUsers(){
         ArrayList<String> list = new ArrayList<String>();
         try{
                 connect = Connexion.getConnexion();
@@ -304,11 +305,38 @@ public class Fonctions {
      * @param id_user
      * @return 
      */
-    public Object []listRooms(int id_user){
+    public static Object []listRooms(int id_user){
         ArrayList<String> list = new ArrayList<String>();
         try{
                 connect = Connexion.getConnexion();
                 String req = "select nom_room from room where id_user='"+id_user+"'";
+                Statement s=connect.createStatement();
+                ResultSet resultats=s.executeQuery(req);
+
+                while(resultats.next()){
+                    String room;
+                    room = resultats.getString(1);
+                    list.add(room);
+                }
+                connect.close();
+
+        }catch(SQLException e)
+        {
+                System.out.println(e.getMessage());
+        }
+        return list.toArray();
+    }
+    
+    
+    /**
+     * Liste de tous les rooms
+     * @return
+     */
+    public static Object []listRooms(){
+        ArrayList<String> list = new ArrayList<String>();
+        try{
+                connect = Connexion.getConnexion();
+                String req = "select nom_room from room";
                 Statement s=connect.createStatement();
                 ResultSet resultats=s.executeQuery(req);
 
@@ -331,7 +359,7 @@ public class Fonctions {
      * @param id
      * @return un utilisateur 
      */
-    public String getUserById(int id){
+    public static String getUserById(int id){
         String user="";
         try{
                 connect = Connexion.getConnexion();
@@ -354,7 +382,7 @@ public class Fonctions {
      * @param id_user
      * @return liste des contacts de user 
      */
-    public Object []listContacts(int id_user){
+    public static Object []listContacts(int id_user){
         ArrayList<String> list = new ArrayList<String>();
         try{
                 connect = Connexion.getConnexion();

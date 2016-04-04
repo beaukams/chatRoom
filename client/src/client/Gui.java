@@ -3,6 +3,8 @@ package client;
 
 import javax.swing.*;
 import java.awt.event.*;
+import java.io.IOException;
+import java.net.UnknownHostException;
 
 
 /**
@@ -12,11 +14,16 @@ import java.awt.event.*;
 
 public class Gui extends JFrame {
 
+	private ChatRoomClient roomClient;
+	
     /**
      * Creates new form Gui
      */
     public Gui() {
+    	
+    	  
         initComponents();
+       
     }
 
     /**
@@ -28,7 +35,7 @@ public class Gui extends JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
     private void initComponents() {
 
-        contenu = new JPanel();
+        setContenu(new JPanel());
         panel_onglet = new JTabbedPane();
         contact = new JPanel();
         gestion_contact = new JScrollPane();
@@ -81,7 +88,7 @@ public class Gui extends JFrame {
         brecherche = new JButton();
         label_pseudo = new JLabel();
         bdeconnexion = new JButton();
-        accueil = new JPanel();
+        setAccueil(new JPanel());
         champ_pseudo = new JTextField();
         label_champ_pseudo = new JLabel();
         jLabel2 = new JLabel();
@@ -116,7 +123,7 @@ public class Gui extends JFrame {
         panel_onglet.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
         panel_onglet.setFont(new java.awt.Font("Ubuntu", 0, 18)); // NOI18N
 
-        contenu.setVisible(false);
+        getContenu().setVisible(false);
         panel_inscrire.setVisible(false);
         combo_liste_contacts.setVisible(false);
         combo_liste_groupes.setVisible(false);
@@ -125,14 +132,12 @@ public class Gui extends JFrame {
         list_contacts.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
         list_contacts.setFont(new java.awt.Font("Ubuntu", 1, 18)); // NOI18N
         list_contacts.setForeground(java.awt.Color.black);
+        
+        
         /*
         liste des contacts
         */
-        list_contacts.setModel(new AbstractListModel<String>() {
-            String[] strings = { "Pseudo nom prenom 1", "Pseudo 2", "Pseudo 3", "Pseudo 4", "Pseudo 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
+        
         list_contacts.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         gestion_contact.setViewportView(list_contacts);
 
@@ -469,11 +474,7 @@ public class Gui extends JFrame {
         /*
         liste des rooms pour la discussion
         */
-        list_rooms.setModel(new AbstractListModel<String>() {
-            String[] strings = { "room1", "room 2", "room 3", "room 4", "room 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
+        
         jScrollPane1.setViewportView(list_rooms);
             
         /*
@@ -492,14 +493,12 @@ public class Gui extends JFrame {
         });
         bsupprimer_room.setIcon(new ImageIcon("icones/button_delete_red.png")); // NOI18N
         bsupprimer_room.setText("Supprimer room");
+        
+        
         /*
         list des contacts pour room
         */
-        list_contact_room.setModel(new AbstractListModel<String>() {
-            String[] strings = { "contact 1", "contact 2", "contact 3", "contact 4", "contact 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
+        
         jScrollPane3.setViewportView(list_contact_room);
 
         
@@ -650,8 +649,8 @@ public class Gui extends JFrame {
         bdeconnexion.setIcon(new ImageIcon("icones/quit.png")); // NOI18N
         bdeconnexion.setText("logout");
 
-        GroupLayout contenuLayout = new GroupLayout(contenu);
-        contenu.setLayout(contenuLayout);
+        GroupLayout contenuLayout = new GroupLayout(getContenu());
+        getContenu().setLayout(contenuLayout);
         contenuLayout.setHorizontalGroup(
             contenuLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(contenuLayout.createSequentialGroup()
@@ -705,13 +704,22 @@ public class Gui extends JFrame {
 
             private void bt_validerActionPerformed(ActionEvent evt) {
                 if(((champ_pseudo.getText()).equals(""))||( (champ_password_con.getText()).equals(""))){
-                    JOptionPane.showMessageDialog(accueil,"veuillez renseigner les champs", "Remplir champs svp", HEIGHT);
+                    JOptionPane.showMessageDialog(getAccueil(),"veuillez renseigner les champs", "Remplir champs svp", HEIGHT);
                     
                 }else{
                     //verification dans la base ,affichage profil, chargement et affectation des donnees
-                    accueil.setVisible(false);
-                    contenu.setVisible(true);
-                    //sinon erreur
+                	try {
+              			Gui.this.roomClient = new ChatRoomClient("127.0.0.1", 20019, Gui.this);
+              			Gui.this.roomClient.initConnexion(champ_pseudo.getText(), champ_password_con.getText());
+              		} catch (UnknownHostException e) {
+              			JOptionPane.showMessageDialog(getAccueil(),"Adresse du serveur invalide", "Erreur", HEIGHT);
+              			
+              		} catch (IOException e) {
+              			JOptionPane.showMessageDialog(getAccueil(),"Le serveur a été arreté!Veuiller vous connecter ultérieurement!", "Erreur", HEIGHT);
+              		}
+                	
+                	
+                    
                 }
             }
         });
@@ -728,7 +736,7 @@ public class Gui extends JFrame {
             }
 
             private void bt_inscrireActionPerformed(ActionEvent evt) {
-                accueil.setVisible(false);
+                getAccueil().setVisible(false);
                 panel_inscrire.setVisible(true);
                 annuler_champ_inscrire();
             }
@@ -745,8 +753,8 @@ public class Gui extends JFrame {
         
         champ_password_con.setText("");
 
-        GroupLayout accueilLayout = new GroupLayout(accueil);
-        accueil.setLayout(accueilLayout);
+        GroupLayout accueilLayout = new GroupLayout(getAccueil());
+        getAccueil().setLayout(accueilLayout);
         accueilLayout.setHorizontalGroup(
             accueilLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(GroupLayout.Alignment.TRAILING, accueilLayout.createSequentialGroup()
@@ -827,7 +835,7 @@ public class Gui extends JFrame {
                         //ajout des informations dans la base de donnees
                         else{
                             panel_inscrire.setVisible(false);
-                            accueil.setVisible(true);
+                            getAccueil().setVisible(true);
                             annuler_champ_accueil();
                         }
                     }catch(Exception e){
@@ -850,7 +858,7 @@ public class Gui extends JFrame {
 
             private void bt_annuler_insActionPerformed(ActionEvent evt) {
                 panel_inscrire.setVisible(false);
-                accueil.setVisible(true);
+                getAccueil().setVisible(true);
                 annuler_champ_accueil();
             }
         });
@@ -949,17 +957,17 @@ public class Gui extends JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addComponent(contenu, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(getContenu(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                .addComponent(accueil, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(getAccueil(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                 .addComponent(panel_inscrire, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addComponent(contenu, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(getContenu(), GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                .addComponent(accueil, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(getAccueil(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                 .addComponent(panel_inscrire, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -1005,7 +1013,47 @@ public class Gui extends JFrame {
         champ_pseudo.setText("");
         champ_password_con.setText("");
     }
-    /**
+    public JPanel getAccueil() {
+		return accueil;
+	}
+
+	public void setAccueil(JPanel accueil) {
+		this.accueil = accueil;
+	}
+
+	public JPanel getContenu() {
+		return contenu;
+	}
+
+	public void setContenu(JPanel contenu) {
+		this.contenu = contenu;
+	}
+	
+	public void refreshListRooms(final String [] rooms){
+		 list_rooms.setModel(new AbstractListModel<String>() {
+	            String[] strings = rooms;
+	            public int getSize() { return strings.length; }
+	            public String getElementAt(int i) { return strings[i]; }
+	        });
+	}
+	
+	public void refreshListContactsRoom(final String [] contacts){
+		list_contact_room.setModel(new AbstractListModel<String>() {
+            String[] strings =  contacts;
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+	}
+	
+	public void refreshListContact(final String [] contacts){
+		list_contacts.setModel(new AbstractListModel<String>() {
+            String[] strings = contacts;
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+	}
+
+	/**
      * @param args the command line arguments
      */
     public static void main(String args[]) {

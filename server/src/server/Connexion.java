@@ -11,8 +11,8 @@ public class Connexion {
 
     private static final String hote="jdbc:mysql://localhost:3306/";
     private static final String bdd="chat";
-    private static final String user="root";
-    private static final String password="";
+    private static final String user="abdoulaye";
+    private static final String password="kamstelecom";
 
     public static Connection connection;
 	public static Connection getConnexion(){	

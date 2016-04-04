@@ -224,6 +224,44 @@ public class ChatRoomServer extends Thread{
 		this.getRoom(idRoom).diffuseFile(msg, source);
 	}
 	
+	/**
+	 * Liste de tous les utilisateurs
+	 */
+	public void sendListUsersChat(){
+		String [] listeUsers = (String []) Fonctions.listUsers();
+		for(int i=0; i<listeUsers.length; i++){
+			this.getBaseRoom().diffuse("USERS:"+listeUsers[i], null);
+		}
+	}
+	
+	/**
+	 * Liste des rooms
+	 */
+	public void sendListRoomsChat(){
+		String [] listeRooms = (String []) Fonctions.listRooms();
+		for(int i=0; i<listeRooms.length; i++){
+			this.getBaseRoom().diffuse("ROOMS:"+listeRooms[i], null);
+		}
+	}
+	
+	public void sendListRoomsUserChat(ThreadUser user){
+		String [] listeRooms = (String []) Fonctions.listRooms();
+		for(int i=0; i<listeRooms.length; i++){
+			this.getBaseRoom().diffuse("ROOMSUSER:"+listeRooms[i], null);
+		}
+	}
+	
+	/**
+	 * Liste des contacts de l'utilisateur
+	 * @param user
+	 */
+	public void sendListContacts(ThreadUser user){
+		String [] listeUsers = (String []) Fonctions.listContacts(user.getUser().getId());
+		for(int i=0; i<listeUsers.length; i++){
+			user.send("CONTACTS:"+listeUsers[i]);
+		}
+	}
+	
 	/* getters et setters */
 	public ServerSocket getServerSocket(){
 		return this.serverSocket;

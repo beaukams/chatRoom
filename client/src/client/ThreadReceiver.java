@@ -6,6 +6,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import javax.swing.JOptionPane;
+
 public class ThreadReceiver extends Thread{
 	private ChatRoomClient client;
 	private TextArea output = null;
@@ -52,7 +54,7 @@ public class ThreadReceiver extends Thread{
 						
 					}else if(msg.startsWith("TFSF:")){ //nom et fin
 						fileName = msg.substring(msg.indexOf(":")+1, msg.length());
-						System.out.println("messs ");
+						//System.out.println("messs ");
 						
 						//cree le 
 						this.client.recvFile(fileName, fileLength, fileContents);
@@ -61,7 +63,15 @@ public class ThreadReceiver extends Thread{
 						fileLength = 0;
 						fileName = "";
 						
-					}else{
+					}else if(msg.startsWith("AUTH:SUCCESS")){
+						this.client.getGui().getAccueil().setVisible(false);
+				        this.client.getGui().getContenu().setVisible(true);
+				        //this.client.getGui().
+					}else if(msg.startsWith("AUTH:DENIED")){
+						this.client.stopClient();
+						JOptionPane.showMessageDialog(this.client.getGui().getAccueil(),"pseudo ou mot de passe invalide!", "Parametres invalides", this.client.getGui().HEIGHT);
+					}
+					else{
 								
 						
 					}
@@ -71,6 +81,7 @@ public class ThreadReceiver extends Thread{
 				
 			}
 		} catch (IOException e) {
+			
 			this.toStop();
 		}
 		

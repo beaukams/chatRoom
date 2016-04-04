@@ -36,7 +36,7 @@ public class ChatRoomClient {
 	
 	public ChatRoomClient(String host, int port, Gui gui) throws UnknownHostException, IOException{
 		this(host, port);
-		this.gui = gui;
+		this.setGui(gui);
 	}
 	
 	/**
@@ -59,6 +59,11 @@ public class ChatRoomClient {
 		
 	}
 	
+	public void initConnexion(String pseudo, String passwd){
+		this.startClient();
+		this.sauthentifie(pseudo, passwd);
+	}
+	
 	public void notifie(String msg){
 		System.out.println(msg + "\n");
 	}
@@ -75,7 +80,16 @@ public class ChatRoomClient {
 		}
 	}
 	
-	
+	/**
+	 * S'authentifier au pres du serveur
+	 * @param pseudo
+	 * @param password
+	 */
+	private void sauthentifie(String pseudo, String password){
+		String msg = "AUTH:"+pseudo+":"+password;
+		this.send(msg);
+		
+	}
 	
 	/**
 	 * Envoyer une chaine de caractere 
@@ -85,6 +99,8 @@ public class ChatRoomClient {
 		this.notifie(new String(msg));
 		this.send(msg.getBytes());
 	}
+	
+	
 	
 	private void send(byte [] msg){
 		try{
@@ -322,10 +338,11 @@ public class ChatRoomClient {
 		}
 		
 		
-		
-		
-		
 	}
+	
+	
+	
+	
 	public boolean getStatus(){
 		return this.running;
 	}
@@ -336,6 +353,14 @@ public class ChatRoomClient {
 	
 	public void setStatus(boolean status){
 		this.running = status;
+	}
+
+	public Gui getGui() {
+		return gui;
+	}
+
+	public void setGui(Gui gui) {
+		this.gui = gui;
 	}
 	
 }

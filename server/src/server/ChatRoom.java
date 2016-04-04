@@ -69,6 +69,17 @@ public class ChatRoom extends Thread{
 		}
 	}
 	
+	public void diffuse(String msg, ThreadUser source){
+		if(this.isInRoom(source)){
+			Iterator<ThreadUser> iter = this.users.iterator();
+			while(iter.hasNext()){
+				ThreadUser user = (ThreadUser) iter.next();
+				if(user != source)
+					user.send(msg);
+			}
+		}
+	}
+	
 	/**
 	 * Diffuser un fichier au membre du room
 	 * @param msg

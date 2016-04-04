@@ -57,6 +57,8 @@ public class ThreadUser extends Thread{
 				buffer = null;
 			}
 		}
+		
+		this.toStop();
 	}
 	
 	public void toStop(){
@@ -84,7 +86,7 @@ public class ThreadUser extends Thread{
 		String msg = "";
 		
 		while(this.containsKeyWord(tout)){
-			System.out.println("tout2 "+tout+"\n");
+		//	System.out.println("tout2 "+tout+"\n");
 			String commande = tout.substring(0, tout.indexOf(":"));
 			tout = tout.substring(tout.indexOf(":")+1, tout.length());
 			
@@ -94,10 +96,10 @@ public class ThreadUser extends Thread{
 			}else
 				msg = tout;
 			
-			System.out.println("tout1 "+tout+"\n");
+			//System.out.println("tout1 "+tout+"\n");
 			
 			//msg = msg.substring(msg.indexOf(":")+1, msg.length());
-			this.server.notifie("commande "+commande+" msg "+msg);
+		//	this.server.notifie("commande "+commande+" msg "+msg);
 			
 			switch(commande){
 			case "MSG":
@@ -107,11 +109,13 @@ public class ThreadUser extends Thread{
 				this.server.diffuseMsg(msg, idRoom, this);
 				break;
 			case "AUTH":
-				String pseudo = msg;
-				//out.println("Bonjour!!!"+pseudo);
-				System.out.println("NOUVEAU UTILISATEUR CONNECTE: "+msg);
-				this.user = new ChatUser(pseudo);
-				this.server.addUser(this);
+				
+				String pseudo = msg.substring(0, msg.indexOf(":"));
+				String passwd = msg.substring(msg.indexOf(":")+1);
+				
+				this.authentifie(pseudo, passwd);
+				
+				msg ="";
 				break;
 				
 			case "TFS":
@@ -146,6 +150,27 @@ public class ThreadUser extends Thread{
 		}
 	}
 	
+	/**
+	 * Authentifer l'utilisateur
+	 * @param pseudo
+	 * @param passwd
+	 */
+	public void authentifie(String pseudo, String passwd){
+		String tabUser [] = Fonctions.connexionUser(pseudo, passwd);
+		//String [] tabUser = {"1", "kams", "kama", "abdoulaye", "kamastelecom", "127.0.0.1", "20067", "k"};
+		
+		if(tabUser != null){
+			this.user = new ChatUser(tabUser);
+			this.server.addUser(this);
+			this.send("AUTH:SUCCESS");
+			//envoie de la liste des utilisateurs
+			
+		}else{
+			this.send("AUTH:DENIED");
+			this.running = false;
+		}
+	}
+	
 	public int indexNextKey(String msg, String key){
 		if(this.containsKeyWord(msg)){
 			return msg.indexOf(key);
@@ -175,7 +200,7 @@ public class ThreadUser extends Thread{
 	
 	public void sendMsg(String msg){
 		this.server.notifie("envoie-----------------------------MSG:"+msg);
-		this.send("MSG:"+msg);
+		this.send("MSG:"+this.user.getPseudo()+msg);
 	}
 	
 	public void sendMsgFile(byte [] msg){
