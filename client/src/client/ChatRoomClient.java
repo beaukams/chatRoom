@@ -380,6 +380,19 @@ public class ChatRoomClient {
 		this.gui.refreshListRooms((String []) this.rooms.toArray());
 	}
 	
+	/**
+	 * Inscription
+	 * @param pseudo
+	 * @param nom
+	 * @param prenom
+	 * @param mdp
+	 * @param ip
+	 * @param port
+	 */
+	public void sinscrire(String pseudo, String nom,String prenom, String mdp,  String ip, String port){
+		
+	}
+	
 	public boolean getStatus(){
 		return this.running;
 	}

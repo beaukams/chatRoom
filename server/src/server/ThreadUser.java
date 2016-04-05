@@ -156,8 +156,8 @@ public class ThreadUser extends Thread{
 	 * @param passwd
 	 */
 	public void authentifie(String pseudo, String passwd){
-		String tabUser [] = Fonctions.connexionUser(pseudo, passwd);
-		//String [] tabUser = {"1", "kams", "kama", "abdoulaye", "kamastelecom", "127.0.0.1", "20067", "k"};
+		//String tabUser [] = Fonctions.connexionUser(pseudo, passwd);
+		String [] tabUser = {"1", "kams", "kama", "abdoulaye", "kamastelecom", "127.0.0.1", "20067", "k"};
 		
 		if(tabUser != null){
 			this.user = new ChatUser(tabUser);

@@ -824,16 +824,22 @@ public class Gui extends JFrame {
             private void bt_valider_insActionPerformed(ActionEvent evt) {
                 if(((champ_nom_ins.getText()).equals(""))||((champ_prenom.getText()).equals(""))||
                         ((champ_pseudo_ins.getText()).equals(""))||((champ_mdp_ins.getText()).equals(""))||
-                        ((champ_add_ip.getText()).equals("")))
+                        ((champ_add_ip.getText()).equals("")) || ((champ_port.getText()).equals("")))
                 {
                     JOptionPane.showMessageDialog(panel_inscrire,"Veuillez remplir les champs svp!", "Warning", HEIGHT);
                     
                 }else{
                     try{
                         int port = Integer.parseInt(champ_port.getText());
-                        if(port<=0)JOptionPane.showMessageDialog(panel_inscrire,"Port est un entier > 0!", "Warning", HEIGHT);
+                        if(port<=0)JOptionPane.showMessageDialog(panel_inscrire,"Port est un entier positif", "Warning", HEIGHT);
                         //ajout des informations dans la base de donnees
+                        
+                        
                         else{
+                        	Gui.this.roomClient = new ChatRoomClient("127.0.0.1", 20019, Gui.this);
+                  			Gui.this.roomClient.sinscrire(champ_pseudo_ins.getText(), champ_nom_ins.getText(), champ_prenom.getText(), champ_mdp_ins.getText(), champ_add_ip.getText(), champ_port.getText());
+                  			
+                  			
                             panel_inscrire.setVisible(false);
                             getAccueil().setVisible(true);
                             annuler_champ_accueil();
